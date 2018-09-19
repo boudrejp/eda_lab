@@ -100,18 +100,50 @@ cancerdata$MedianAge[cancerdata$MedianAge > 85] <- rnorm(mean = mean(cancerdata$
                                                          n = length(cancerdata$MedianAge[cancerdata$MedianAge > 85]))
 #over half of the values for PctSomeCol18_24 are missing.
 #probably makes sense to either completely get rid of col or possibly just exclude NA's and go with data we have
-cancerdata$AvgHouseholdSize[cancerdata$AvgHouseholdSize == 0] <- NA
+cancerdata$AvgHouseholdSize[cancerdata$AvgHouseholdSize < 1] <- NA
 #probablty ok now to look at multivar stuff
 
 boxplot(PctWhite ~ state, data = cancerdata)
 boxplot(deathRate ~ state, data = cancerdata)
 
 numeric.cols <- as.logical(unlist(lapply(cancerdata, is.numeric)))
-corr.matric <- cor(cancerdata[,numeric.cols])
+corr.matrix <- cor(cancerdata[,numeric.cols])
 #do corrplot later
+
+### ScatterplotMAtrix, with notes ######
 scatterplotMatrix(~deathRate + medIncome + MedianAge + PctWhite, data = cancerdata)
+#death rate slight negative correlation with medIncome, PctWhite... 
+
 scatterplotMatrix(~deathRate + povertyPercent + AvgHouseholdSize + PercentMarried, data = cancerdata)
+#death rate positive correlation with povertyPercent (consistent with previous)
+#higher marriage rates correspond to lower poverty rates
+
 scatterplotMatrix(~deathRate + BirthRate + PctUnemployed16_Over + PctPrivateCoverage, data = cancerdata)
+#death rate has little relationship to BirthRate
+#death rate has slight positive correlation with unemployment
 
+scatterplotMatrix(~deathRate + PctPublicCoverage + PctPrivateCoverage + PctEmpPrivCoverage, data = cancerdata)
+#death rate has positive correlation with public coverage, negative with all types of private coverage
+#logic checks out that all insurance types are related to each other
 
+scatterplotMatrix(~deathRate + PercentMarried + MedianAgeMale + MedianAgeFemale + AvgHouseholdSize, data = cancerdata)
+#older median ages tend to be more married
+#older median ages tend to have smaller household size (kids moving out?)
+#death rate slight negative correlation with percent married
 
+scatterplotMatrix(~deathRate + PctNoHS18_24 + PctHS18_24 + PctSomeCol18_24 + PctBachDeg18_24, data = cancerdata)
+#in general, more education is correlated with lower death rate
+
+scatterplotMatrix(~deathRate + PctHS25_Over + PctBachDeg25_Over + PctEmployed16_Over + PctUnemployed16_Over, data = cancerdata)
+#yet again, more education correlated with lower death rate
+#employment also is correlated with lower death rate
+
+scatterplotMatrix(~deathRate + PctWhite + PctBlack + PctAsian + PctOtherRace, data = cancerdata)
+#shows segregation
+#death rate is better for asians, whites
+#test out a white + asian metric
+
+cancerdata$pctwhiteasian <- cancerdata$PctWhite + cancerdata$PctAsian
+cancerdata$pctnonwhiteasian <- cancerdata$PctBlack + cancerdata$PctOtherRace
+scatterplotMatrix(~deathRate + pctwhiteasian + pctnonwhiteasian, data = cancerdata)
+#more pronounced bad effects for nonwhite/nonasian
