@@ -100,9 +100,18 @@ cancerdata$MedianAge[cancerdata$MedianAge > 85] <- rnorm(mean = mean(cancerdata$
                                                          n = length(cancerdata$MedianAge[cancerdata$MedianAge > 85]))
 #over half of the values for PctSomeCol18_24 are missing.
 #probably makes sense to either completely get rid of col or possibly just exclude NA's and go with data we have
-
+cancerdata$AvgHouseholdSize[cancerdata$AvgHouseholdSize == 0] <- NA
 #probablty ok now to look at multivar stuff
 
+boxplot(PctWhite ~ state, data = cancerdata)
+boxplot(deathRate ~ state, data = cancerdata)
+
+numeric.cols <- as.logical(unlist(lapply(cancerdata, is.numeric)))
+corr.matric <- cor(cancerdata[,numeric.cols])
+#do corrplot later
+scatterplotMatrix(~deathRate + medIncome + MedianAge + PctWhite, data = cancerdata)
+scatterplotMatrix(~deathRate + povertyPercent + AvgHouseholdSize + PercentMarried, data = cancerdata)
+scatterplotMatrix(~deathRate + BirthRate + PctUnemployed16_Over + PctPrivateCoverage, data = cancerdata)
 
 
 
