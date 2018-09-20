@@ -3,6 +3,7 @@
 require(car)
 require(dplyr)
 require(reshape2)
+require(corrplot)
 #data import
 cancerdata <- read.csv("./project materials/cancer.csv")
 
@@ -147,3 +148,9 @@ cancerdata$pctwhiteasian <- cancerdata$PctWhite + cancerdata$PctAsian
 cancerdata$pctnonwhiteasian <- cancerdata$PctBlack + cancerdata$PctOtherRace
 scatterplotMatrix(~deathRate + pctwhiteasian + pctnonwhiteasian, data = cancerdata)
 #more pronounced bad effects for nonwhite/nonasian
+
+#corrplot heatmap
+corrplot(corr.matrix, type = "upper")
+#corrplot better shows some of these relationships
+#need to debug the ? though
+#distinct relationships with poverty percent to lots of other vars
